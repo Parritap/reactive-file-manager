@@ -14,6 +14,6 @@ public interface IFileService{
     // Store username and files as in plural, so I need to put several files in into this function.
     void saveFiles (String fileGroup, List<String> base64Files);
 
-    Mono<FileResponseDTO> saveFile (FileResponseDTO FileDTO);
+    Mono<File> saveFile (FileResponseDTO FileDTO);
     Flux<File> getFiles (String fileGroup) throws ResponseStatusException;
 }

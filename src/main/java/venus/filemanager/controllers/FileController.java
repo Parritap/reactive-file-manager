@@ -8,7 +8,6 @@ import venus.filemanager.model.File;
 import venus.filemanager.model.FileResponseDTO;
 import venus.filemanager.service.implementation.FileService;
 
-import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -19,30 +18,28 @@ public class FileController {
 
     private final FileService fileService;
 
-    //Describe de problem
-
-    @GetMapping("/getfiles/{fileGroup}")
-    public Flux<FileResponseDTO> getFiles (@PathVariable String fileGroup) {
-        return fileService.getFiles(fileGroup)
-                .map(file -> FileResponseDTO.builder()
-                        .id(file.getId())
-                        .fileGroup(file.getFileGroup())
-                        .fileName(file.getFileName())
-                        .base64Data(convertBytesToBase64(file.getData()))
-                        .build());
-    }
+//    @GetMapping("/getfiles/{fileGroup}")
+//    public Flux<FileResponseDTO> getFiles (@PathVariable String fileGroup) {
+//        return fileService.getFiles(fileGroup)
+//                .map(file -> FileResponseDTO.builder()
+//                        .id(file.getId())
+//                        .fileGroup(file.getFileGroup())
+//                        .fileName(file.getFileName())
+//                        .base64Data(convertBytesToBase64(file.getData()))
+//                        .build());
+//    }
 
 
     @PostMapping("/postFile/{fileGroup}")
-    public Mono<FileResponseDTO> saveFile (@PathVariable String fileGroup, @RequestBody FileResponseDTO FileDTO) {
-        return fileService.saveFile(FileDTO);
+    public Mono<File> saveFile (@PathVariable String fileGroup, @RequestBody FileResponseDTO FileDTO) {
+        return fileService.saveFile(FileDTO).log();
     }
 
-    @GetMapping("/getBinaryFiles/{fileGroup}")
-    public Flux<List<Byte>> getBinaryFiles (@PathVariable String fileGroup) {
-        return fileService.getFiles(fileGroup)
-                .map(File::getData);
-    }
+//    @GetMapping("/getBinaryFiles/{fileGroup}")
+//    public Flux<List<Byte>> getBinaryFiles (@PathVariable String fileGroup) {
+//        return fileService.getFiles(fileGroup)
+//                .map(File::getData);
+//    }
 
 
 

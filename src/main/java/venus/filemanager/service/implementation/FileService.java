@@ -12,7 +12,10 @@ import venus.filemanager.model.FileResponseDTO;
 import venus.filemanager.repository.FileRepository;
 import venus.filemanager.service.specificaction.IFileService;
 
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -26,11 +29,11 @@ public class FileService implements IFileService {
     }
 
     @Override
-    public Mono<FileResponseDTO> saveFile(FileResponseDTO fileDTO) {
+    public Mono<File> saveFile(FileResponseDTO fileDTO) {
         return fileRepository.save(
-                File.builder().fileName(fileDTO.getFileName())
-                        .fileGroup(fileDTO.getFileGroup())
-                        .data(decodeData(fileDTO.getBase64Data()))
+                File.builder().fileName(fileDTO.fileName())
+                        .fileGroup(fileDTO.fileGroup())
+                        .data(Base64.getDecoder().decode(fileDTO.base64Data()))
                         .build()
         );
     }
@@ -44,9 +47,5 @@ public class FileService implements IFileService {
                                 "No files found for file group: " + fileGroup
                         )
                 ));
-    }
-
-    private List<Byte> decodeData(String base) {
-        return new Base64Decoder()
     }
 }

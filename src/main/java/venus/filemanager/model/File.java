@@ -6,11 +6,10 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.util.List;
 
 @Builder
 @Data
-@Table(name = "File")
+@Table(name = "file")
 public class File {
     @Id
     String id;
@@ -18,7 +17,6 @@ public class File {
     String fileGroup;
     @Column("file_name")
     String fileName;
-    @Column("file")
-    List<Byte> data;
-
+    @Column("data")
+    byte[] data;
 }

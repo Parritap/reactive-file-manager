@@ -1,13 +1,17 @@
 package venus.filemanager.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Builder
-@Data
-public class FileResponseDTO {
-    String id;
-    String fileGroup;
-    String fileName;
-    String base64Data;
+/**
+ * DTO meant to be sent by the frontend to the back and not otherwise.
+ */
+public record FileResponseDTO(
+        String fileGroup,
+        String fileName,
+        String base64Data
+) {
 }
