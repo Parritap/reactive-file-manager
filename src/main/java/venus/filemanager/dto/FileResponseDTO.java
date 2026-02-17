@@ -1,9 +1,6 @@
-package venus.filemanager.model;
+package venus.filemanager.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Builder
 /**

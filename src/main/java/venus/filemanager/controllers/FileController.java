@@ -1,11 +1,13 @@
 package venus.filemanager.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import venus.filemanager.dto.FilesRequestDTO;
 import venus.filemanager.model.File;
-import venus.filemanager.model.FileResponseDTO;
+import venus.filemanager.dto.FileResponseDTO;
 import venus.filemanager.service.implementation.FileService;
 
 
@@ -30,9 +32,10 @@ public class FileController {
 //    }
 
 
-    @PostMapping("/postFile/{fileGroup}")
-    public Mono<File> saveFile (@PathVariable String fileGroup, @RequestBody FileResponseDTO FileDTO) {
-        return fileService.saveFile(FileDTO).log();
+    @PostMapping("/saveFile")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<File> saveFile(@RequestBody FileResponseDTO FileDTO) {
+        return fileService.saveFile(FileDTO);
     }
 
 //    @GetMapping("/getBinaryFiles/{fileGroup}")
@@ -41,8 +44,10 @@ public class FileController {
 //                .map(File::getData);
 //    }
 
-
-
+    @PostMapping("/saveFiles")
+    public Flux<File> saveFiles(@RequestBody FilesRequestDTO dto) {
+        return fileService.saveFiles(dto);
+    }
 
 
     private String convertBytesToBase64(java.util.List<Byte> bytes) {
