@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import venus.filemanager.dto.FileResponseDTO;
 import venus.filemanager.dto.FilesRequestDTO;
 import venus.filemanager.model.File;
-import venus.filemanager.dto.FileResponseDTO;
 import venus.filemanager.repository.FileRepository;
 import venus.filemanager.service.specificaction.IFileService;
 
@@ -36,17 +36,36 @@ public class FileService implements IFileService {
         );
     }
 
+//    @Override
+//    public Flux<File> saveFiles(FilesRequestDTO dto) {
+//        return fileRepository.saveAll(
+//                dto.files().stream().map(e -> File
+//                        .builder()
+//                        .fileGroup(dto.fileGroup())
+//                        .fileName(e.fileName())
+//                        .data(Base64.getDecoder().decode(e.base64Data()))
+//                        .build()
+//                ).toList()
+//        );
+//    }
+
     @Override
     public Flux<File> saveFiles(FilesRequestDTO dto) {
-        return fileRepository.saveAll(
-                dto.files().stream().map(e -> File
-                        .builder()
-                        .fileGroup(dto.fileGroup())
-                        .fileName(e.fileName())
-                        .data(Base64.getDecoder().decode(e.base64Data()))
-                        .build()
-                ).toList()
-        );
+        return Flux.fromIterable(dto.files())
+                .flatMap(fileDTO -> {
+                    File file = File.builder()
+                            .fileGroup(dto.fileGroup())
+                            .fileName(fileDTO.fileName())
+                            .data(Base64.getDecoder().decode(fileDTO.base64Data()))
+                            .build();
+
+                    return fileRepository.findByFileName(fileDTO.fileName())
+                            .flatMap(existing -> {
+                                file.setId(existing.getId());
+                                return fileRepository.save(file);
+                            })
+                            .switchIfEmpty(fileRepository.save(file));
+                });
     }
 
     @Override
