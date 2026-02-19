@@ -3,11 +3,13 @@ package venus.filemanager.service.implementation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import venus.filemanager.dto.FileResponseDTO;
 import venus.filemanager.dto.FilesRequestDTO;
+import venus.filemanager.exceptions.FileSizeExceeded;
 import venus.filemanager.model.File;
 import venus.filemanager.repository.FileRepository;
 import venus.filemanager.service.specificaction.IFileService;
@@ -36,27 +38,24 @@ public class FileService implements IFileService {
         );
     }
 
-//    @Override
-//    public Flux<File> saveFiles(FilesRequestDTO dto) {
-//        return fileRepository.saveAll(
-//                dto.files().stream().map(e -> File
-//                        .builder()
-//                        .fileGroup(dto.fileGroup())
-//                        .fileName(e.fileName())
-//                        .data(Base64.getDecoder().decode(e.base64Data()))
-//                        .build()
-//                ).toList()
-//        );
-//    }
 
     @Override
-    public Flux<File> saveFiles(FilesRequestDTO dto) {
+    public Flux<File> saveFiles(FilesRequestDTO dto) throws FileSizeExceeded {
         return Flux.fromIterable(dto.files())
                 .flatMap(fileDTO -> {
+                    byte[] decodedData = Base64.getDecoder().decode(fileDTO.base64Data());
+
+                    // Validate file size before saving
+                    if (decodedData.length > 102400) { // 100KB limit
+                        return Mono.error(new FileSizeExceeded(
+                                "File '" + fileDTO.fileName() + "' exceeds 100KB limit. Size: " + decodedData.length + " bytes"
+                        ));
+                    }
+
                     File file = File.builder()
                             .fileGroup(dto.fileGroup())
                             .fileName(fileDTO.fileName())
-                            .data(Base64.getDecoder().decode(fileDTO.base64Data()))
+                            .data(decodedData)
                             .build();
 
                     return fileRepository.findByFileName(fileDTO.fileName())
@@ -78,4 +77,5 @@ public class FileService implements IFileService {
                         )
                 ));
     }
+
 }

@@ -11,8 +11,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ControllersExceptionsHandler {
 
 
-//    @ExceptionHandler(DuplicateKeyException.class)
-//    ResponseEntity<@NonNull String> duplicateKey (Exception e) {
-//        return ResponseEntity.badRequest().body( "Recurso duplicado");
-//    }
+    @ExceptionHandler(DuplicateKeyException.class)
+    ResponseEntity<@NonNull String> duplicateKey (Exception e) {
+        return ResponseEntity.badRequest().body( "Recurso duplicado");
+    }
+
+    @ExceptionHandler(FileSizeExceeded.class)
+    ResponseEntity<@NonNull String> fileSizeExceedHandler (Exception e) {
+        return ResponseEntity.internalServerError().body("The file exceeds the 100Kb limit");
+    }
 }
